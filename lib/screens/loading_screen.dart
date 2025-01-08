@@ -1,3 +1,4 @@
+import 'package:climaa/services/location.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -8,51 +9,24 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
 
-  void getLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          print('Location permissions are denied');
-          return;
-        }
-      }
+  Location location = Location();
 
-      if (permission == LocationPermission.deniedForever) {
-        // Permissions are permanently denied
-        print('Location permissions are permanently denied. Please enable them in settings.');
-        Geolocator.openAppSettings(); // Optionally, navigate the user to app settings
-        return;
-      }
-
-      // If permissions are granted, get the location
-      final LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.low,
-        distanceFilter: 100,
-      );
-
-      Position position = await Geolocator.getCurrentPosition(
-        locationSettings: locationSettings,
-      );
-
-      print("User's location: ${position.latitude}, ${position.longitude}");
-    } catch (e) {
-      print('Error while getting location: $e');
-    }
+  void getLocation() async{
+    await location.getLocation();
+    print("User's location: ${location.latitude}, ${location.longitude}");
   }
   @override
+  void initState()  {
+    super.initState();
+    getLocation();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
+    print('buil is called ');
     return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // determinePosition();
-            getLocation();
-          },
-          child: Text('Get Location'),
-        ),
-      ),
+      appBar: AppBar(),
     );
   }
 }
