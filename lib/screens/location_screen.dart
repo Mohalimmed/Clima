@@ -3,11 +3,39 @@ import 'package:flutter/material.dart';
 
 
 class LocationScreen extends StatefulWidget {
+
+  final weatherData;
+
+  const LocationScreen({super.key, this.weatherData});
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+
+  String? description;
+  String? country;
+  String? weatherIcons;
+  String? name;
+  int? temperature;
+  @override
+  void initState() {
+    super.initState();
+    getUpdate(widget.weatherData);
+  }
+  void getUpdate(dynamic weatherData){
+     description = weatherData['current']['weather_descriptions'][0];
+     country = weatherData['location']['country'];
+     name = weatherData['location']['name'];
+     temperature = weatherData['current']['temperature'];
+     weatherIcons = weatherData['current']['weather_icons'][0];
+
+     print(name);
+     print(description);
+     print(temperature);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,15 +57,15 @@ class _LocationScreenState extends State<LocationScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  ElevatedButton(
-                    onPressed: () {},
+                  GestureDetector(
+                    onTap: () {},
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
+                  GestureDetector(
+                    onTap: () {},
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -50,7 +78,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      '32°',
+                      '$temperature°',
                       style: kTempTextStyle,
                     ),
                     Text(
@@ -63,7 +91,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "It's 🍦 time in San Francisco!",
+                  "$description",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
