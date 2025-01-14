@@ -22,9 +22,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
       lat: location.latitude.toString(),
       lon: location.longitude.toString(),
     );
-    var weatherData = await networkHelper.getData();
+    var weatherData = await networkHelper.getLocationData();
 
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => LocationScreen(weatherData: weatherData),

@@ -1,39 +1,43 @@
+import 'package:climaa/screens/city_screen.dart';
+import 'package:climaa/services/networking.dart';
+import 'package:climaa/services/weather.dart';
 import 'package:climaa/utilities/constants.dart';
 import 'package:flutter/material.dart';
 
-
 class LocationScreen extends StatefulWidget {
-
   final weatherData;
 
   const LocationScreen({super.key, this.weatherData});
+
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-
+  WeatherModel weatherModel = WeatherModel();
   String? description;
   String? country;
-  String? weatherIcons;
   String? name;
+  String? temp;
   int? temperature;
+  var weatherIcons;
+
   @override
   void initState() {
     super.initState();
     getUpdate(widget.weatherData);
   }
-  void getUpdate(dynamic weatherData){
-     description = weatherData['current']['weather_descriptions'][0];
-     country = weatherData['location']['country'];
-     name = weatherData['location']['name'];
-     temperature = weatherData['current']['temperature'];
-     weatherIcons = weatherData['current']['weather_icons'][0];
 
-     print(name);
-     print(description);
-     print(temperature);
-
+  void getUpdate(dynamic weatherData) {
+    setState(() {
+      description = weatherData['current']['weather_descriptions'][0];
+      country = weatherData['location']['country'];
+      name = weatherData['location']['name'];
+      temperature = weatherData['current']['temperature'];
+      temp = weatherModel.getMessage(temperature!);
+      int weatherIcon = weatherData['current']['weather_code'];
+      weatherIcons = weatherModel.getWeatherIcon(weatherIcon);
+    });
   }
 
   @override
@@ -58,14 +62,19 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   GestureDetector(
-                    onTap: () {},
-                    child: Icon(
-                      Icons.near_me,
-                      size: 50.0,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
+                    onTap: () async {
+                      var typeName = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CityScreen(),
+                          ));
+                      if (typeName != null) {
+                        NetworkHelper networkHelper = NetworkHelper();
+                        var weatherData =
+                            await networkHelper.getCityData(typeName);
+                        getUpdate(weatherData);
+                      }
+                    },
                     child: Icon(
                       Icons.location_city,
                       size: 50.0,
@@ -82,16 +91,17 @@ class _LocationScreenState extends State<LocationScreen> {
                       style: kTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      '$weatherIcons',
                       style: kConditionTextStyle,
                     ),
                   ],
                 ),
               ),
+              Text(description ?? 'unknown' ,style: kButtonTextStyle,textAlign: TextAlign.center,),
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "$description",
+                  "$temp in $name",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
